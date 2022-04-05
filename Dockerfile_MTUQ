@@ -1,0 +1,54 @@
+FROM jupyter/minimal-notebook
+
+LABEL maintainer="Ian Wang"
+
+USER root
+
+# ENV PATH="/root/miniconda3/bin:${PATH}"
+# ARG PATH="/root/miniconda3/bin:${PATH}"
+
+RUN apt-get update
+RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb && rm -rf /var/lib/apt/lists/*
+
+# RUN wget \
+#     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+#     && mkdir /root/.conda \
+#     && bash Miniconda3-latest-Linux-x86_64.sh -b \
+#     && rm -f Miniconda3-latest-Linux-x86_64.sh 
+
+USER jovyan
+
+RUN conda config --prepend channels conda-forge \
+    && conda install obspy \
+    && conda install -c conda-forge pygmt \
+    && conda install numpy=1.21 xarray
+
+RUN mkdir /home/jovyan/scoped \
+    && cd /home/jovyan/scoped \
+    && git clone https://github.com/uafgeotools/mtuq.git \
+    && cd mtuq \
+    && pip install -e . \
+    && conda install mpi4py \
+    && bash ./data/examples/unpack.bash
+
+RUN cd /home/jovyan/scoped \
+    && git clone --depth=1 https://github.com/uafgeotools/pysep.git
+
+RUN cd /home/jovyan/scoped \
+    && mkdir -p fk_src \
+    && cd fk_src/ \
+    && wget https://www.eas.slu.edu/People/LZhu/downloads/fk3.3.tar -O fk3.3.tar \
+    && tar -xvf fk3.3.tar \
+    && cd fk/ \
+    && wget https://www.physics.utoronto.ca/~liuqy/temp/fk-20220331.patch -O fk-20220331.patch \
+    && patch < fk-20220331.patch \
+    && make \
+    && make clean \
+    && mkdir bin \
+    && cp fk syn st_fk trav sachd fk2mt bin/
+
+ENV PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
+ARG PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
+
+RUN conda env create -f /home/jovyan/scoped/pysep/setup/pysep.yml
+
