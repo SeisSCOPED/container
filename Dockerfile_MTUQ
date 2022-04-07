@@ -43,9 +43,8 @@ RUN cd /home/jovyan/scoped \
     && wget https://www.physics.utoronto.ca/~liuqy/temp/fk-20220331.patch -O fk-20220331.patch \
     && patch < fk-20220331.patch \
     && make \
-    && make clean \
     && mkdir bin \
-    && cp fk syn st_fk trav sachd fk2mt bin/
+    && cp fk syn st_fk trav sachd fk2mt fk.pl bin/
 
 ENV PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
 ARG PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
