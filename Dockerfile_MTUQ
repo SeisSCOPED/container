@@ -1,9 +1,9 @@
-FROM --platform=linux/arm64 jupyter/minimal-notebook
+FROM --platform=linux/arm64 jupyter/minimal-notebook as stage-arm64
 USER jovyan
 RUN conda config --env --set subdir osx-arm64 \
     && conda config --prepend channels conda-forge
 
-FROM --platform=linux/amd64 jupyter/minimal-notebook
+FROM --platform=linux/amd64 jupyter/minimal-notebook as stage-amd64
 USER jovyan
 RUN conda config --prepend channels conda-forge
 
