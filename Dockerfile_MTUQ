@@ -15,11 +15,7 @@ RUN conda config --prepend channels conda-forge \
     && conda install xarray \
     && conda install cartopy \
     && conda install mpi4py \
-    && conda clean -afy \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete \
-    && find /opt/conda/lib/python*/site-packages/bokeh/server/static -follow -type f -name '*.js' ! -name '*.min.js' -delete
+    && conda clean -afy
 
 RUN mkdir /home/jovyan/scoped \
     && cd /home/jovyan/scoped \
