@@ -21,7 +21,7 @@ USER jovyan
 
 RUN conda install obspy \
     && conda install -c conda-forge pygmt \
-    && conda install numpy=1.21 xarray \
+    && conda install xarray \
     && conda install cartopy
 
 RUN mkdir /home/jovyan/scoped \
