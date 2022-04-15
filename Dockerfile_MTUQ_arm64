@@ -1,0 +1,46 @@
+FROM jupyter/minimal-notebook
+
+LABEL maintainer="Ian Wang"
+
+USER root
+
+RUN apt-get update
+RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb vim nano && rm -rf /var/lib/apt/lists/*
+
+USER jovyan
+
+RUN conda config --env --set subdir osx-arm64 \
+    && conda config --prepend channels conda-forge \
+    && conda install obspy \
+    && conda install -c conda-forge pygmt \
+    && conda install numpy=1.21 xarray \
+    && conda install cartopy
+
+RUN mkdir /home/jovyan/scoped \
+    && cd /home/jovyan/scoped \
+    && git clone https://github.com/uafgeotools/mtuq.git \
+    && cd mtuq \
+    && pip install -e . \
+    && conda install mpi4py \
+    && bash ./data/examples/unpack.bash
+
+RUN cd /home/jovyan/scoped \
+    && git clone https://github.com/thurinj/mtuq_workshop_2022.git
+
+RUN cd /home/jovyan/scoped \
+    && git clone --depth=1 https://github.com/uafgeotools/pysep.git
+
+RUN cd /home/jovyan/scoped \
+    && mkdir -p fk_src \
+    && cd fk_src/ \
+    && wget https://www.eas.slu.edu/People/LZhu/downloads/fk3.3.tar -O fk3.3.tar \
+    && tar -xvf fk3.3.tar \
+    && cd fk/ \
+    && wget https://www.physics.utoronto.ca/~liuqy/temp/fk-20220331.patch -O fk-20220331.patch \
+    && patch < fk-20220331.patch \
+    && make \
+    && mkdir bin \
+    && cp fk syn st_fk trav sachd fk2mt fk.pl bin/
+
+ENV PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
+ARG PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
