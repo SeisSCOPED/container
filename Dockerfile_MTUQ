@@ -4,24 +4,16 @@ LABEL maintainer="Ian Wang"
 
 USER root
 
-# ENV PATH="/root/miniconda3/bin:${PATH}"
-# ARG PATH="/root/miniconda3/bin:${PATH}"
-
 RUN apt-get update
-RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb && rm -rf /var/lib/apt/lists/*
-
-# RUN wget \
-#     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-#     && mkdir /root/.conda \
-#     && bash Miniconda3-latest-Linux-x86_64.sh -b \
-#     && rm -f Miniconda3-latest-Linux-x86_64.sh 
+RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb vim nano && rm -rf /var/lib/apt/lists/*
 
 USER jovyan
 
 RUN conda config --prepend channels conda-forge \
     && conda install obspy \
     && conda install -c conda-forge pygmt \
-    && conda install numpy=1.21 xarray
+    && conda install numpy=1.21 xarray \
+    && conda install cartopy
 
 RUN mkdir /home/jovyan/scoped \
     && cd /home/jovyan/scoped \
@@ -30,6 +22,9 @@ RUN mkdir /home/jovyan/scoped \
     && pip install -e . \
     && conda install mpi4py \
     && bash ./data/examples/unpack.bash
+
+RUN cd /home/jovyan/scoped \
+    && git clone https://github.com/thurinj/mtuq_workshop_2022.git
 
 RUN cd /home/jovyan/scoped \
     && git clone --depth=1 https://github.com/uafgeotools/pysep.git
@@ -48,6 +43,3 @@ RUN cd /home/jovyan/scoped \
 
 ENV PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
 ARG PATH="/home/jovyan/scoped/fk_src/fk/bin:${PATH}"
-
-RUN conda env create -f /home/jovyan/scoped/pysep/setup/pysep.yml
-
