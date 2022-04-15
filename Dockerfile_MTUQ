@@ -1,5 +1,3 @@
-LABEL maintainer="Ian Wang"
-
 FROM --platform=linux/arm64 jupyter/minimal-notebook
 USER jovyan
 RUN conda config --env --set subdir osx-arm64 \
@@ -11,6 +9,8 @@ RUN conda config --prepend channels conda-forge
 
 ARG TARGETARCH
 FROM stage-${TARGETARCH} as final
+
+LABEL maintainer="Ian Wang"
 
 USER root
 
