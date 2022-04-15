@@ -1,6 +1,16 @@
-FROM jupyter/minimal-notebook
-
 LABEL maintainer="Ian Wang"
+
+FROM --platform=linux/arm64 jupyter/minimal-notebook
+USER jovyan
+RUN conda config --env --set subdir osx-arm64 \
+    && conda config --prepend channels conda-forge
+
+FROM --platform=linux/amd64 jupyter/minimal-notebook
+USER jovyan
+RUN conda config --prepend channels conda-forge
+
+ARG TARGETARCH
+FROM stage-${TARGETARCH} as final
 
 USER root
 
@@ -9,8 +19,7 @@ RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb vim nano
 
 USER jovyan
 
-RUN conda config --prepend channels conda-forge \
-    && conda install obspy \
+RUN conda install obspy \
     && conda install -c conda-forge pygmt \
     && conda install numpy=1.21 xarray \
     && conda install cartopy
