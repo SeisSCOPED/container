@@ -5,7 +5,7 @@ LABEL maintainer="Ian Wang"
 USER root
 
 RUN apt-get update
-RUN apt-get install -y wget ssh rsync less build-essential gfortran gdb vim nano && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y wget ssh less build-essential gfortran gdb vim nano && rm -rf /var/lib/apt/lists/*
 
 USER jovyan
 
