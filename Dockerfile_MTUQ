@@ -19,7 +19,7 @@ RUN conda config --prepend channels conda-forge \
 
 RUN mkdir /home/jovyan/scoped \
     && cd /home/jovyan/scoped \
-    && git clone https://github.com/uafgeotools/mtuq.git \
+    && git clone --depth=1 https://github.com/uafgeotools/mtuq.git \
     && cd mtuq \
     && pip install -e . \
     && bash ./data/examples/unpack.bash
